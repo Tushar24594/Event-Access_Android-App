@@ -1,0 +1,2 @@
+rootProject.name='Event Access'
+include ':app'
