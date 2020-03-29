@@ -6,4 +6,6 @@
     <string name="email">Email Id</string>
     <string name="phone">Mobile Number</string>
     <string name="submitBtn">Submit</string>
+    <string name="qrcode">QR Code</string>
+    <string name="showThisQrCode">Show this QR Code for your seamless access to the event</string>
 </resources>

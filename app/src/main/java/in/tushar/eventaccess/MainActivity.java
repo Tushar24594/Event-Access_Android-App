@@ -3,15 +3,21 @@ package in.tushar.eventaccess;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Patterns;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -33,11 +39,16 @@ import java.util.Calendar;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import androidmads.library.qrgenearator.QRGContents;
+import androidmads.library.qrgenearator.QRGEncoder;
+import androidmads.library.qrgenearator.QRGSaver;
+
 public class MainActivity extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     public static String Tag = ">>MainActivity";
     TextView registerText, detailText, nameText, emailText, phoneText;
     EditText nameEdit, emailEdit, phoneEdit;
+    String userName, userEmail, userPhone;
     Button submitBtn;
     Typeface light, medium, regular, bold;
     DBHelper dbHelper;
@@ -49,15 +60,18 @@ public class MainActivity extends AppCompatActivity {
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyy hh:mm:ss aa");
     String date;
+    private String savePath = Environment.getExternalStorageDirectory().getPath() + "/QRCode/";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         dbHelper = new DBHelper(this);
-        light = Typeface.createFromAsset(getAssets(),"fonts/light.ttf");
-        medium = Typeface.createFromAsset(getAssets(),"fonts/medium.ttf");
-        regular = Typeface.createFromAsset(getAssets(),"fonts/regular.ttf");
-        bold = Typeface.createFromAsset(getAssets(),"fonts/bold.ttf");
+        light = Typeface.createFromAsset(getAssets(), "fonts/light.ttf");
+        medium = Typeface.createFromAsset(getAssets(), "fonts/medium.ttf");
+        regular = Typeface.createFromAsset(getAssets(), "fonts/regular.ttf");
+        bold = Typeface.createFromAsset(getAssets(), "fonts/bold.ttf");
+        checkMultiplePermission();
         registerText = findViewById(R.id.registerText);
         registerText.setTypeface(regular);
         detailText = findViewById(R.id.detailsText);
@@ -89,10 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if(phoneEdit.requestFocus()){
-                    Log.e(Tag,"Focus...."+s);
-                    if(phoneEdit.getText().toString().trim().length()==10){
-                        if(!isFind){
+                if (phoneEdit.requestFocus()) {
+                    Log.e(Tag, "Focus...." + s);
+                    if (phoneEdit.getText().toString().trim().length() == 10) {
+                        if (!isFind) {
                             getDataFromFirebase(phoneEdit.getText().toString().trim());
                             phoneEdit.clearFocus();
                             phoneEdit.setFocusable(false);
@@ -113,34 +127,44 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
     }
-    public void submitData(View v){
-        Log.e(Tag,"Clicked! : "+v);
-        String userName,userEmail,userPhone;
+
+    public void submitData(View v) {
+        Log.e(Tag, "Clicked! : " + v);
+
         userName = nameEdit.getText().toString().trim();
         userEmail = emailEdit.getText().toString().trim();
         userPhone = phoneEdit.getText().toString().trim();
-        if(userName.isEmpty()){
+        if (userName.isEmpty()) {
             nameEdit.setError("Please Enter Your Name");
             nameEdit.requestFocus();
             return;
         }
-        if(userEmail.isEmpty() || !validEmail(userEmail)){
+        if (userEmail.isEmpty() || !validEmail(userEmail)) {
             emailEdit.setError("Please enter your Email");
             emailEdit.requestFocus();
             return;
         }
-        if(userPhone.isEmpty() || userPhone.length()<10){
+        if (userPhone.isEmpty() || userPhone.length() < 10) {
             phoneEdit.setError("Please Enter Your Mobile Number");
             phoneEdit.requestFocus();
             return;
         }
-        if(!userName.isEmpty() && !userEmail.isEmpty() && !userPhone.isEmpty()){
+
+        submitBtn.setScaleX((float) 0.9);
+        submitBtn.setScaleY((float) 0.9);
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                submitBtn.setScaleX((float) 1.0);
+                submitBtn.setScaleY((float) 1.0);
+                if (!userName.isEmpty() && !userEmail.isEmpty() && !userPhone.isEmpty()) {
 //            FireBase Realtime Database
-            date = simpleDateFormat.format(calendar.getTime());
-            myRef.child(userPhone).child("name").setValue(userName);
-            myRef.child(userPhone).child("email").setValue(userEmail);
-            myRef.child(userPhone).child("phone").setValue(userPhone);
-            myRef.child(userPhone).child("date").setValue(date);
+                    date = simpleDateFormat.format(calendar.getTime());
+                    myRef.child(userPhone).child("name").setValue(userName);
+                    myRef.child(userPhone).child("email").setValue(userEmail);
+                    myRef.child(userPhone).child("phone").setValue(userPhone);
+                    myRef.child(userPhone).child("date").setValue(date);
+                    generateQRCode(userName, userEmail, userPhone);
 //            Data insert into SQLite
 //            dbHelper.insertData(userName,userPhone,userEmail);
 //            Cursor result = dbHelper.getData(userPhone);
@@ -156,35 +180,29 @@ public class MainActivity extends AppCompatActivity {
 //                }
 //                Log.e(Tag," DB >>>>>>>> "+buffer.toString());
 //            }
-        }
-        submitBtn.setScaleX((float)0.9);
-        submitBtn.setScaleY((float)0.9);
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                submitBtn.setScaleX((float)1.0);
-                submitBtn.setScaleY((float)1.0);
+                }
             }
-        },300);
+        }, 300);
     }
+
     private boolean validEmail(String email) {
         Pattern pattern = Patterns.EMAIL_ADDRESS;
         return pattern.matcher(email).matches();
     }
 
-    public void getDataFromFirebase(String phone){
-        Log.e(Tag,"Get Data From Firebase with that number...."+phone);
-        try{
+    public void getDataFromFirebase(String phone) {
+        Log.e(Tag, "Get Data From Firebase with that number...." + phone);
+        try {
             myRef.child(phone).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                     Log.e(Tag, " Data is :" + map);
-                    try{
+                    try {
                         JSONObject object = new JSONObject(map);
-                        Log.d(Tag," Name is :" + object.getString("name"));
-                        Log.d(Tag," email is :" + object.getString("email"));
-                        Log.d(Tag," phone is :" + object.getString("phone"));
+                        Log.d(Tag, " Name is :" + object.getString("name"));
+                        Log.d(Tag, " email is :" + object.getString("email"));
+                        Log.d(Tag, " phone is :" + object.getString("phone"));
                         nameEdit.setText(object.getString("name"));
                         emailEdit.setText(object.getString("email"));
                         phoneEdit.setText(object.getString("phone"));
@@ -193,7 +211,7 @@ public class MainActivity extends AppCompatActivity {
                         phoneEdit.setFocusable(false);
                         phoneEdit.setFocusableInTouchMode(true);
                         nameEdit.setFocusable(true);
-                    }catch (JSONException e){
+                    } catch (JSONException e) {
                         e.printStackTrace();
                     }
                 }
@@ -203,9 +221,38 @@ public class MainActivity extends AppCompatActivity {
 
                 }
             });
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void generateQRCode(String userName, String userEmail, String userPhone) {
+        Log.e(Tag, "Generate QR Code...");
+        String qrData = "name=" + userName + ";" + "email=" + userEmail + ";" + "phone=" + userPhone + ";";
+        WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Display display = manager.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        int width = point.x;
+        int height = point.y;
+        int smallerDimension = width < height ? width : height;
+        smallerDimension = smallerDimension * 3 / 4;
+        try {
+            QRGEncoder qrgEncoder = new QRGEncoder(qrData, null, QRGContents.Type.TEXT, smallerDimension);
+            Bitmap bitmap = qrgEncoder.getBitmap();
+            QRGSaver qrgSaver = new QRGSaver();
+            qrgSaver.save(savePath, userPhone, bitmap, QRGContents.ImageType.IMAGE_JPEG);
+            Intent intent = new Intent(getApplicationContext(), qrCode.class);
+            intent.putExtra("QRimage", savePath + userPhone + ".jpg");
+            startActivity(intent);
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    public Boolean checkMultiplePermission(){
+
+        return true;
     }
     @Override
     public void onBackPressed() {
