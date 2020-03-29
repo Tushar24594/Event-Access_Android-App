@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Event Access</string>
+    <string name="register">Register</string>
+    <string name="addYourDetail">Add your personal details</string>
+    <string name="fullName">Full Name</string>
+    <string name="email">Email Id</string>
+    <string name="phone">Mobile Number</string>
+    <string name="submitBtn">Submit</string>
 </resources>
