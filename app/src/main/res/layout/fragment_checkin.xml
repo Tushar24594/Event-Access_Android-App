@@ -19,14 +19,13 @@
             android:text="Check ins"
             android:textSize="25sp"
             android:textColor="@color/textBlue"/>
-        <ImageView
+        <ImageButton
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:id="@+id/qrImage"
-            android:src="@drawable/qr"
+            android:background="@drawable/qr"
             android:padding="10sp"
-            android:layout_gravity="end"
-            android:onClick="showQRCode"/>
+            android:layout_gravity="end"/>
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

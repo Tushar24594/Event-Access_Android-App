@@ -6,7 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -65,7 +67,17 @@ public class MainActivity extends AppCompatActivity {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyy hh:mm:ss aa");
     String date;
     private String savePath = Environment.getExternalStorageDirectory().getPath() + "/QRCode/";
-
+    //    SharedPreferences
+    String sharedDataPhone;
+    SharedPreferences.Editor editor;
+    SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs" ;
+    public static final String nameKey = "nameKey";
+    public static final String phoneKey = "phoneKey";
+    public static final String emailKey = "emailKey";
+    public static final String qrCodeKey = "qrCodeKey";
+    //    public static final String cityKey = "cityKey";
+    //    public static final String stateKey = "stateKey";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +88,17 @@ public class MainActivity extends AppCompatActivity {
         regular = Typeface.createFromAsset(getAssets(), "fonts/regular.ttf");
         bold = Typeface.createFromAsset(getAssets(), "fonts/bold.ttf");
         checkMultiplePermission();
+        //shared preferences
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        sharedDataPhone=sharedpreferences.getString(phoneKey, null);
+        if(sharedDataPhone!=null){
+            Log.e(Tag,"Phone is :"+sharedDataPhone);
+            Intent intent = new Intent(getApplicationContext(),DetailedActivity.class);
+            startActivity(intent);
+            finish();
+        }else{
+            Log.e(Tag,"Empty");
+        }
         registerText = findViewById(R.id.registerText);
         registerText.setTypeface(regular);
         detailText = findViewById(R.id.detailsText);
@@ -169,6 +192,10 @@ public class MainActivity extends AppCompatActivity {
                     myRef.child(userPhone).child("phone").setValue(userPhone);
                     myRef.child(userPhone).child("date").setValue(date);
                     generateQRCode(userName, userEmail, userPhone);
+//                    editor.putString(nameKey,userName);
+//                    editor.putString(emailKey,userEmail);
+//                    editor.putString(phoneKey,userPhone);
+//                    editor.commit();
 //            Data insert into SQLite
 //            dbHelper.insertData(userName,userPhone,userEmail);
 //            Cursor result = dbHelper.getData(userPhone);
@@ -231,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void generateQRCode(String userName, String userEmail, String userPhone) {
-        Log.e(Tag, "Generate QR Code...");
+        Log.e(Tag, "Generate QR Code..."+userName+" - "+userEmail+" - "+userPhone);
         String qrData = "name=" + userName + ";" + "email=" + userEmail + ";" + "phone=" + userPhone + ";";
         WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
         Display display = manager.getDefaultDisplay();
@@ -246,8 +273,14 @@ public class MainActivity extends AppCompatActivity {
             Bitmap bitmap = qrgEncoder.getBitmap();
             QRGSaver qrgSaver = new QRGSaver();
             qrgSaver.save(savePath, userPhone, bitmap, QRGContents.ImageType.IMAGE_JPEG);
+            editor = sharedpreferences.edit();
+            editor.putString(nameKey,userName);
+            editor.putString(emailKey,userEmail);
+            editor.putString(phoneKey,userPhone);
+            editor.putString(qrCodeKey,savePath + userPhone + ".jpg");
+            editor.commit();
             Intent intent = new Intent(getApplicationContext(), qrCode.class);
-            intent.putExtra("QRimage", savePath + userPhone + ".jpg");
+//            intent.putExtra("QRimage", savePath + userPhone + ".jpg");
             startActivity(intent);
             finish();
         } catch (Exception e) {

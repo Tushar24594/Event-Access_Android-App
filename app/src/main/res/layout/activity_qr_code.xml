@@ -5,15 +5,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".qrCode">
-
+<ImageView
+    android:id="@+id/back"
+    android:layout_width="50dp"
+    android:layout_height="50dp"
+    android:src="@drawable/ic_back"
+    android:layout_marginLeft="20dp"
+    android:layout_marginTop="20dp"
+    android:padding="15dp"/>
     <ScrollView
+        android:layout_below="@id/back"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="40dp"
+            android:paddingLeft="40dp"
+            android:paddingBottom="40dp"
+            android:paddingRight="40dp"
             android:gravity="center">
             <TextView
                 android:id="@+id/qrText"
@@ -35,8 +45,7 @@
                 android:layout_width="400sp"
                 android:layout_height="400sp"
                 android:id="@+id/qrImage"
-                android:layout_marginTop="50sp"
-               />
+                android:layout_marginTop="50sp"/>
 
         </LinearLayout>
     </ScrollView>

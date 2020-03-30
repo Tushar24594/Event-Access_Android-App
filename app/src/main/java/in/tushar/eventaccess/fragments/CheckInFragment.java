@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -33,6 +34,7 @@ import in.tushar.eventaccess.HttpRequest;
 import in.tushar.eventaccess.R;
 import in.tushar.eventaccess.checkInCardAdapter;
 import in.tushar.eventaccess.checkInModel;
+import in.tushar.eventaccess.qrCode;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -55,6 +57,8 @@ public class CheckInFragment extends Fragment {
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa");
     String date;
+    ImageButton qrImageButton;
+
     public CheckInFragment() {
         // Required empty public constructor
 
@@ -94,6 +98,15 @@ public class CheckInFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_checkin, container, false);
         recyclerView = view.findViewById(R.id.recycler);
+        qrImageButton = view.findViewById(R.id.qrImage);
+        qrImageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.e(TAG, "Showing QR Code.....");
+                Intent intent = new Intent(getActivity(), qrCode.class);
+                startActivity(intent);
+            }
+        });
         fetchJson();
         return view;
     }
@@ -213,11 +226,5 @@ public class CheckInFragment extends Fragment {
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    public void showQRCode(View v){
-        Log.e(TAG,"Showing QR Code.....");
-        Intent intent = new Intent(getActivity(), QRCode.class);
-        startActivity(intent);
     }
 }
