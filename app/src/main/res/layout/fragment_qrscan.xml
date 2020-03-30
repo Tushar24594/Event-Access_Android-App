@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".fragments.QRScanFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/qrImage"
+            android:src="@drawable/qr"
+            android:layout_gravity="end"
+            android:layout_marginRight="30sp"
+            android:layout_marginTop="30sp"
+            android:visibility="gone"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_gravity="center"
+            android:padding="30dp"
+            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scanText"
+                android:text="@string/scanText"
+                android:textColor="@color/textBlue"
+                android:gravity="center"
+                android:textSize="24sp"/>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/scanText2"
+                android:text="@string/accessText"
+                android:textColor="@color/grey"
+                android:gravity="center"
+                android:textSize="23sp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

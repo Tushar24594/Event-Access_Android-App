@@ -2,8 +2,12 @@ package in.tushar.eventaccess;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Point;
@@ -251,8 +255,17 @@ public class MainActivity extends AppCompatActivity {
         }
     }
     public Boolean checkMultiplePermission(){
-
-        return true;
+        boolean res = false;
+        int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        int permissionCheckCam = ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED && permissionCheckCam != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, 3);
+            res = true;
+        }
+        else {
+            res = false;
+        }
+        return res;
     }
     @Override
     public void onBackPressed() {

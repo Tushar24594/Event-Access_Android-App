@@ -8,4 +8,6 @@
     <string name="submitBtn">Submit</string>
     <string name="qrcode">QR Code</string>
     <string name="showThisQrCode">Show this QR Code for your seamless access to the event</string>
+    <string name="scanText">Scan QR Code</string>
+    <string name="accessText">To access the event please scan QR code</string>
 </resources>
