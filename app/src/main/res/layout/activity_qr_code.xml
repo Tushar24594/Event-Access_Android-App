@@ -47,6 +47,7 @@
                 android:id="@+id/qrImage"
                 android:layout_marginTop="50sp"/>
 
+
         </LinearLayout>
     </ScrollView>
 

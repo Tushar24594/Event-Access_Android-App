@@ -20,7 +20,8 @@ import java.io.File;
 public class qrCode extends AppCompatActivity {
     boolean doubleBackToExitPressedOnce = false;
     public static String TAG = ">>QR Code Activity";
-    TextView t1,t2;
+    public static TextView t1;
+    public static TextView t2;
     ImageView qrImage,back;
     String genQRCodeImage;
     Typeface light, medium, regular, bold;
@@ -47,6 +48,7 @@ public class qrCode extends AppCompatActivity {
         t2.setTypeface(regular);
         qrImage = findViewById(R.id.qrImage);
         back = findViewById(R.id.back);
+
         //shared preferences
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         genQRCodeImage = sharedpreferences.getString(qrCodeKey,null);

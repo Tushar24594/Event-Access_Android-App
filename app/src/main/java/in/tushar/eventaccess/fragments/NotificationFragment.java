@@ -48,7 +48,7 @@ public class NotificationFragment extends Fragment {
     private final int jsoncode = 1;
     private static ProgressDialog mProgressDialog;
     Calendar calendar = Calendar.getInstance();
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa");
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd MMMM, hh:mm aa");
     String date;
     public NotificationFragment() {
         // Required empty public constructor
@@ -129,6 +129,7 @@ public class NotificationFragment extends Fragment {
             if(jsonObject.getString("status").equals("true")){
                 JSONArray jsonArray = jsonObject.getJSONArray("data");
                 date = simpleDateFormat.format(calendar.getTime());
+                Log.e(TAG,"Date and Time : "+date);
                 for(int i=0;i<jsonArray.length();i++){
                     notificationModel list = new notificationModel();
                     JSONObject dataObj =jsonArray.getJSONObject(i);

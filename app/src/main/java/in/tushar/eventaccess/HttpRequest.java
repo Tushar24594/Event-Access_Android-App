@@ -143,7 +143,7 @@ public class HttpRequest {
         BufferedReader br=new BufferedReader(new InputStreamReader(con.getInputStream()));
         StringBuilder response=new StringBuilder();
         for(String line;(line=br.readLine())!=null;)response.append(line+"\n");
-        Log.d("ressss",response.toString());
+//        Log.d("ressss",response.toString());
         return response.toString();
     }
     /**

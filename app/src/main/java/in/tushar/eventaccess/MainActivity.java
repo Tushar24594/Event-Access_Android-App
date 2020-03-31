@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     String date;
     private String savePath = Environment.getExternalStorageDirectory().getPath() + "/QRCode/";
     //    SharedPreferences
-    String sharedDataPhone;
+    String sharedDataPhone,sharedDataName,sharedDataEmail;
     SharedPreferences.Editor editor;
     SharedPreferences sharedpreferences;
     public static final String MyPREFERENCES = "MyPrefs" ;
@@ -91,8 +91,12 @@ public class MainActivity extends AppCompatActivity {
         //shared preferences
         sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         sharedDataPhone=sharedpreferences.getString(phoneKey, null);
+        sharedDataName=sharedpreferences.getString(nameKey, null);
+        sharedDataEmail=sharedpreferences.getString(emailKey, null);
         if(sharedDataPhone!=null){
             Log.e(Tag,"Phone is :"+sharedDataPhone);
+            Log.e(Tag,"Name is :"+sharedDataName);
+            Log.e(Tag,"Eamil is :"+sharedDataEmail);
             Intent intent = new Intent(getApplicationContext(),DetailedActivity.class);
             startActivity(intent);
             finish();
@@ -229,22 +233,30 @@ public class MainActivity extends AppCompatActivity {
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     Map<String, Object> map = (Map<String, Object>) dataSnapshot.getValue();
                     Log.e(Tag, " Data is :" + map);
-                    try {
-                        JSONObject object = new JSONObject(map);
-                        Log.d(Tag, " Name is :" + object.getString("name"));
-                        Log.d(Tag, " email is :" + object.getString("email"));
-                        Log.d(Tag, " phone is :" + object.getString("phone"));
-                        nameEdit.setText(object.getString("name"));
-                        emailEdit.setText(object.getString("email"));
-                        phoneEdit.setText(object.getString("phone"));
-                        isFind = true;
-                        phoneEdit.clearFocus();
-                        phoneEdit.setFocusable(false);
-                        phoneEdit.setFocusableInTouchMode(true);
-                        nameEdit.setFocusable(true);
-                    } catch (JSONException e) {
-                        e.printStackTrace();
+                    if(map!=null){
+                        try {
+                            Log.e(Tag, " Exist in firbase:" );
+                            JSONObject object = new JSONObject(map);
+                            Log.d(Tag, " Name is :" + object.getString("name"));
+                            Log.d(Tag, " email is :" + object.getString("email"));
+                            Log.d(Tag, " phone is :" + object.getString("phone"));
+                            nameEdit.setText(object.getString("name"));
+                            emailEdit.setText(object.getString("email"));
+                            phoneEdit.setText(object.getString("phone"));
+                            isFind = true;
+                            phoneEdit.clearFocus();
+                            phoneEdit.setFocusable(false);
+                            phoneEdit.setFocusableInTouchMode(true);
+                            nameEdit.setFocusable(true);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }else{
+                        Log.e(Tag, " Empty in firbase:" );
                     }
+
                 }
 
                 @Override

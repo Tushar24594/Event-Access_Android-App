@@ -31,8 +31,7 @@ import in.tushar.eventaccess.fragments.QRScanFragment;
 
 public class DetailedActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigation;
-    private BottomNavigationView bottomNavigationItemView;
-
+    public final static String TAG="--Detailed Activity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,13 +45,13 @@ public class DetailedActivity extends AppCompatActivity {
 
     private void firebasePushNotification() {
 // Access a Cloud Firestore instance from your Activity
-        final FirebaseFirestore db =FirebaseFirestore.getInstance();
+        final FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseInstanceId.getInstance().getInstanceId()
                 .addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
                     @Override
                     public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                        if(!task.isSuccessful()){
-                            Log.w(">>Firebase Notifi","Failed",task.getException());
+                        if (!task.isSuccessful()) {
+                            Log.w(">>Firebase Notifi", "Failed", task.getException());
                             return;
                         }
                         // Get new Instance ID token
@@ -61,10 +60,10 @@ public class DetailedActivity extends AppCompatActivity {
                         // Log and toast
                         String msg = getString(R.string.msg_token_fmt, token);
                         Log.d(">>Firebase Notification", msg);
-                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
-                        Log.w(">>Firebase Token","Token : "+token);
-                        Map<String,Object> pushToken = new HashMap<>();
-                        pushToken.put("token",token);
+//                        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_SHORT).show();
+                        Log.w(">>Firebase Token", "Token : " + token);
+                        Map<String, Object> pushToken = new HashMap<>();
+                        pushToken.put("token", token);
                         // Add a new document with a generated ID
                         db.collection("push-tokens")
                                 .add(pushToken)
@@ -93,7 +92,8 @@ public class DetailedActivity extends AppCompatActivity {
 
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
             new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                     switch (item.getItemId()) {
                         case R.id.scanQR:
                             openFragment(QRScanFragment.newInstance("", ""));

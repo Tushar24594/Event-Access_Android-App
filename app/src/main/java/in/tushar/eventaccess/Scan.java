@@ -1,10 +1,12 @@
 package in.tushar.eventaccess;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import in.tushar.eventaccess.fragments.CheckInFragment;
 import in.tushar.eventaccess.fragments.QRScanFragment;
 import me.dm7.barcodescanner.zbar.Result;
 import me.dm7.barcodescanner.zbar.ZBarScannerView;
@@ -37,8 +39,12 @@ public class Scan extends AppCompatActivity implements ZBarScannerView.ResultHan
         Log.v("kkkk", result.getContents()); // Prints scan results
         Log.v("uuuu", result.getBarcodeFormat().getName()); // Prints the scan format (qrcode, pdf417 etc.)
 
-        QRScanFragment.scanData.replace("",result.getContents());
-//        MainActivity.tvresult.setText(result.getContents());
+//        QRScanFragment.qr
+        QRScanFragment.qrDataScan.setText(result.getContents());
+        QRScanFragment qrScanFragment = new QRScanFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("qr",result.getContents());
+        qrScanFragment.setArguments(bundle);
         onBackPressed();
 
     }

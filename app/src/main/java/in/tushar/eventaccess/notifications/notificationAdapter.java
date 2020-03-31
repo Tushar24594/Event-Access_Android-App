@@ -39,6 +39,7 @@ public class notificationAdapter extends RecyclerView.Adapter<notificationAdapte
         Picasso.get().load(notificationModelArrayList.get(position).getImageUrl()).into(holder.imageView);
         holder.header.setText(notificationModelArrayList.get(position).getNotificationHeader());
         holder.description.setText(notificationModelArrayList.get(position).getNotificationDes());
+        holder.dateTime.setText(notificationModelArrayList.get(position).getDateTime());
     }
 
     @Override

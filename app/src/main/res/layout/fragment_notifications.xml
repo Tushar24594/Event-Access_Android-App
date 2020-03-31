@@ -16,7 +16,7 @@
             android:layout_gravity="center"
             android:gravity="center"
             android:layout_height="wrap_content"
-            android:text="Check ins"
+            android:text="@string/notification"
             android:textSize="25sp"
             android:textColor="@color/textBlue"/>
         <ImageButton

@@ -3,6 +3,7 @@ package in.tushar.eventaccess.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import java.util.HashMap;
 
 import in.tushar.eventaccess.HttpRequest;
 import in.tushar.eventaccess.R;
+import in.tushar.eventaccess.SharePref;
 import in.tushar.eventaccess.checkInCardAdapter;
 import in.tushar.eventaccess.checkInModel;
 import in.tushar.eventaccess.qrCode;
@@ -58,10 +60,27 @@ public class CheckInFragment extends Fragment {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm aa");
     String date;
     ImageButton qrImageButton;
-
+    SharePref sharePref = new SharePref();
+    //    SharedPreferences
+    String sharedDataPhone;
+    SharedPreferences.Editor editor;
+    SharedPreferences sharedpreferences;
+    public static final String MyPREFERENCES = "MyPrefs";
+    private static final String PLACE_OBJ = "users";
+    public static final String nameKey = "nameKey";
+    public static final String phoneKey = "phoneKey";
+    public static final String emailKey = "emailKey";
+    public static final String manufactureKey = "manufactureKey";
+    public static final String checkInTimeKey = "checkInTimeKey";
+    public static final String checkOutTimeKey = "checkOutTimeKey";
+    String name ;
+    String email;
+    String phone ;
+    String manufacture ;
+    String cin ;
+    String cout ;
     public CheckInFragment() {
         // Required empty public constructor
-
     }
 
     /**
@@ -97,8 +116,26 @@ public class CheckInFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_checkin, container, false);
-        recyclerView = view.findViewById(R.id.recycler);
-        qrImageButton = view.findViewById(R.id.qrImage);
+        try{
+            sharedpreferences = this.getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+             name = sharedpreferences.getString(nameKey,"");
+             email = sharedpreferences.getString(emailKey,"");
+             phone = sharedpreferences.getString(phoneKey,"");
+             manufacture = sharedpreferences.getString(manufactureKey,"");
+             cin = sharedpreferences.getString(checkInTimeKey,"");
+             cout = sharedpreferences.getString(checkOutTimeKey,"");
+            Log.e(TAG,"Shared name : "+name+phone+email+manufacture+cin+cout);
+            recyclerView = view.findViewById(R.id.recycler);
+            qrImageButton = view.findViewById(R.id.qrImage);
+//            checkInModel checkInModels = new checkInModel();
+//            checkInModels.setHeader(manufacture);
+//            checkInModels.setCheckInTime(cin);
+//            checkInModels.setCheckOutTime(cout);
+        }catch (Exception e){
+            e.printStackTrace();
+            Log.e(TAG,"Error to add card : "+e);
+        }
+
         qrImageButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,7 +149,7 @@ public class CheckInFragment extends Fragment {
     }
 
     private void fetchJson() {
-        showSimpleProgressDialog(getActivity(), "Loading...", "Fetching Json", false);
+        showSimpleProgressDialog(getActivity(), "Loading...", "Fetching Data", false);
         new AsyncTask<Void, Void, String>() {
             protected String doInBackground(Void[] params) {
                 String response = "";
@@ -128,14 +165,14 @@ public class CheckInFragment extends Fragment {
 
             public void onPostExecute(String result) {
                 //do something with response
-                Log.d("newwwss", result);
+//                Log.d("newwwss", result);
                 onTaskCompleted(result, jsoncode);
             }
         }.execute();
     }
 
     private void onTaskCompleted(String response, int serviceCode) {
-        Log.d("responsejson", response.toString());
+//        Log.d("responsejson", response.toString());
         switch (serviceCode) {
             case jsoncode:
                 if (isSuccess(response)) {
@@ -145,7 +182,7 @@ public class CheckInFragment extends Fragment {
                     recyclerView.setAdapter(checkInCardAdapter);
                     recyclerView.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 } else {
-                    Toast.makeText(getActivity(), "Error fetch json", Toast.LENGTH_SHORT).show();
+//                    Toast.makeText(getActivity(), "Error fetch json", Toast.LENGTH_SHORT).show();
                 }
         }
     }
@@ -155,21 +192,35 @@ public class CheckInFragment extends Fragment {
         try {
             JSONObject jsonObject = new JSONObject(response);
             date = simpleDateFormat.format(calendar.getTime());
-//            Log.e(">>>CheckIn Activity",date);
+//            String getQrData = sharePref.getPlaceObj();
+//            Log.e(">>>CheckIn Activity",getQrData);
+
             if (jsonObject.get("status").equals("true")) {
                 JSONArray jsonArray = jsonObject.getJSONArray("data");
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    checkInModel checkInModels = new checkInModel();
-                    JSONObject dataObj = jsonArray.getJSONObject(i);
-                    checkInModels.setHeader(dataObj.getString("name"));
-                    checkInModels.setCheckInTime(date);
-                    modelArrayList.add(checkInModels);
+                for (int i = 0; i < 1; i++) {
+                    if(!manufacture.isEmpty()){
+                        checkInModel checkInModels = new checkInModel();
+                        JSONObject dataObj = jsonArray.getJSONObject(i);
+//                    checkInModels.setHeader(dataObj.getString("name"));
+//                    checkInModels.setCheckInTime(date);
+                        checkInModels.setHeader(manufacture);
+                        checkInModels.setCheckInTime(cin);
+                        checkInModels.setCheckOutTime(cout);
+                        modelArrayList.add(checkInModels);
+                    }else{
+                        Toast.makeText(getActivity(), "No one can CheckIn", Toast.LENGTH_SHORT).show();
+                    }
+
                 }
+//                Log.e(">>>CheckIn Json", String.valueOf(jsonArray));
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }catch (Exception e){
+            e.printStackTrace();
         }
+//        Log.e(">>>CheckIn Array", String.valueOf(modelArrayList));
         return modelArrayList;
     }
 
